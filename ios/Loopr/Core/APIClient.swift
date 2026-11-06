@@ -60,17 +60,24 @@ struct Empty: Codable {}
 
 final class APIClient: APIClientProtocol {
     static let tokenKey = "loopr.token"
-    private let base: URL
+    static let devURLKey = "loopr.devBaseURL"
     private let session: URLSession
     var onUnauthorized: (() -> Void)?
 
-    init(session: URLSession = .shared) {
-        // Env override lets UI tests point at the CI backend; otherwise Info.plist (from the xcconfig).
-        let s = ProcessInfo.processInfo.environment["LOOPR_API_BASE_URL"]
+    init(session: URLSession = .shared) { self.session = session }
+
+    /// Resolved on every request so the Debug "Server URL" box takes effect immediately.
+    /// Order: Debug override box -> env var (UI tests) -> Info.plist (xcconfig) -> localhost.
+    private var base: URL {
+        var s: String?
+        #if DEBUG
+        s = UserDefaults.standard.string(forKey: Self.devURLKey)
+        #endif
+        s = s.flatMap { $0.isEmpty ? nil : $0 }
+            ?? ProcessInfo.processInfo.environment["LOOPR_API_BASE_URL"]
             ?? Bundle.main.object(forInfoDictionaryKey: "LOOPR_API_BASE_URL") as? String
             ?? "http://127.0.0.1:8000"
-        self.base = URL(string: s)!
-        self.session = session
+        return URL(string: s!.trimmingCharacters(in: .whitespacesAndNewlines)) ?? URL(string: "http://127.0.0.1:8000")!
     }
 
     private static let decoder: JSONDecoder = {

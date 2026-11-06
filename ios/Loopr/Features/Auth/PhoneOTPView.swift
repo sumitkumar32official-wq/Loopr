@@ -74,6 +74,9 @@ struct PhoneOTPView: View {
                 case .otp: otpStep
                 }
                 if let e = vm.error { Text(e).font(.loCaption).foregroundColor(Theme.danger) }
+                #if DEBUG
+                DevServerBox()
+                #endif
                 Spacer()
                 Text("By continuing you agree to the Terms & Privacy Policy.")
                     .font(.loCaption).foregroundColor(Theme.textSecondary)
@@ -124,6 +127,31 @@ struct PhoneOTPView: View {
         }
     }
 }
+
+#if DEBUG
+/// Debug builds only: point the app at any backend (e.g. a tunnel URL) without rebuilding.
+struct DevServerBox: View {
+    @State private var url = UserDefaults.standard.string(forKey: APIClient.devURLKey) ?? ""
+    @State private var saved = false
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            FieldLabel(text: "Dev server URL (debug builds only)")
+            HStack {
+                TextField("https://your-tunnel.trycloudflare.com", text: $url)
+                    .textInputAutocapitalization(.never).autocorrectionDisabled()
+                    .keyboardType(.URL).foregroundColor(.white)
+                    .accessibilityIdentifier("devServerField")
+                Button(saved ? "Saved" : "Save") {
+                    UserDefaults.standard.set(url.trimmingCharacters(in: .whitespacesAndNewlines), forKey: APIClient.devURLKey)
+                    saved = true
+                }.foregroundColor(Theme.teal)
+            }
+            .padding(10).background(Theme.surface).clipShape(RoundedRectangle(cornerRadius: 10))
+            .onChange(of: url) { _, _ in saved = false }
+        }
+    }
+}
+#endif
 
 struct Shake: GeometryEffect {
     var animatableData: CGFloat

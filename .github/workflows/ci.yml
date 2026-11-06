@@ -16,6 +16,41 @@ jobs:
       - run: pip install -r requirements.txt
       - run: python -m pytest -q
 
+  # Builds a simulator .app and uploads it to Appetize.io so you can tap through the app in a browser.
+  # Needs the GitHub secret APPETIZE_TOKEN. Optional repo variable APPETIZE_PUBLIC_KEY keeps the same link on every build.
+  preview:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - run: brew install xcodegen
+      - name: Build simulator app
+        working-directory: ios
+        run: |
+          set -o pipefail
+          xcodegen generate
+          xcodebuild build -project Loopr.xcodeproj -scheme Loopr -configuration Debug \
+            -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build CODE_SIGNING_ALLOWED=NO 2>&1 | tail -40
+          cd build/Build/Products/Debug-iphonesimulator && zip -qr "$GITHUB_WORKSPACE/Loopr.zip" Loopr.app
+      - name: Upload to Appetize
+        env:
+          APPETIZE_TOKEN: ${{ secrets.APPETIZE_TOKEN }}
+          APPETIZE_PUBLIC_KEY: ${{ vars.APPETIZE_PUBLIC_KEY }}
+        run: |
+          if [ -z "$APPETIZE_TOKEN" ]; then echo "APPETIZE_TOKEN secret not set; skipping."; exit 0; fi
+          ARGS=(-F "file=@Loopr.zip" -F "platform=ios")
+          if [ -n "$APPETIZE_PUBLIC_KEY" ]; then ARGS+=(-F "publicKey=$APPETIZE_PUBLIC_KEY"); fi
+          curl -sS -u "$APPETIZE_TOKEN:" https://api.appetize.io/v1/apps "${ARGS[@]}" | tee appetize.json
+          echo
+          KEY=$(python3 -c "import json;print(json.load(open('appetize.json')).get('publicKey',''))")
+          if [ -n "$KEY" ]; then
+            echo "### Open the app: https://appetize.io/app/$KEY" >> "$GITHUB_STEP_SUMMARY"
+            echo "Public key: \`$KEY\` (save it as repo variable APPETIZE_PUBLIC_KEY to keep this link)" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "Upload did not return a publicKey; see output above."; exit 1
+          fi
+
   ios:
     runs-on: macos-latest
     timeout-minutes: 30
