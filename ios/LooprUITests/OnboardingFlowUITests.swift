@@ -30,6 +30,21 @@ final class OnboardingFlowUITests: XCTestCase {
         try? s.pngRepresentation.write(to: URL(fileURLWithPath: file))
     }
 
+    /// SwiftUI merges child texts into one accessibility element, so match on a partial label of ANY element.
+    private func element(containing text: String) -> XCUIElement {
+        app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", text)).firstMatch
+    }
+
+    private func waitFor(_ text: String, timeout: TimeInterval = 20, file: StaticString = #filePath, line: UInt = #line) -> XCUIElement {
+        let e = element(containing: text)
+        if !e.waitForExistence(timeout: timeout) {
+            // Dump what the app actually shows, so a failure is diagnosable from the artifact alone.
+            try? app.debugDescription.write(toFile: "\(shotDir)/tree-\(shotIndex).txt", atomically: true, encoding: .utf8)
+            XCTFail("Did not find any element containing '\(text)'", file: file, line: line)
+        }
+        return e
+    }
+
     private func dismissKeyboard() {
         app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.1)).tap()
     }
@@ -59,8 +74,7 @@ final class OnboardingFlowUITests: XCTestCase {
         tapButton("Verify")
 
         // 2. Society
-        let lotus = app.staticTexts["Lotus Boulevard"]
-        XCTAssertTrue(lotus.waitForExistence(timeout: 20), "Society list did not load")
+        let lotus = waitFor("Lotus Boulevard")
         shot("society-selection")
         lotus.tap()
 
@@ -95,11 +109,11 @@ final class OnboardingFlowUITests: XCTestCase {
         tapButton("Set up UPI Autopay")
 
         // 8. Home: subscription must be confirmed active by the backend
-        XCTAssertTrue(app.staticTexts["Scheduled"].waitForExistence(timeout: 30), "Dashboard did not reach 'Scheduled'")
+        _ = waitFor("Scheduled", timeout: 30)
         shot("home-dashboard")
 
         app.tabBars.buttons["Vehicles"].tap()
-        XCTAssertTrue(app.staticTexts["Active"].waitForExistence(timeout: 20), "Vehicle not shown as Active")
+        _ = waitFor("Active")
         shot("vehicles")
     }
 }

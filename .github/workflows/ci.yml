@@ -59,7 +59,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-screenshots
-          path: /tmp/loopr-shots/*.png
+          path: /tmp/loopr-shots/
           if-no-files-found: warn
       - name: Upload backend log
         if: always()
