@@ -65,7 +65,10 @@ final class APIClient: APIClientProtocol {
     var onUnauthorized: (() -> Void)?
 
     init(session: URLSession = .shared) {
-        let s = Bundle.main.object(forInfoDictionaryKey: "LOOPR_API_BASE_URL") as? String ?? "http://127.0.0.1:8000"
+        // Env override lets UI tests point at the CI backend; otherwise Info.plist (from the xcconfig).
+        let s = ProcessInfo.processInfo.environment["LOOPR_API_BASE_URL"]
+            ?? Bundle.main.object(forInfoDictionaryKey: "LOOPR_API_BASE_URL") as? String
+            ?? "http://127.0.0.1:8000"
         self.base = URL(string: s)!
         self.session = session
     }

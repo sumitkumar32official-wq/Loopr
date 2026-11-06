@@ -66,6 +66,7 @@ struct LooprField: View {
                 .padding(12).background(Theme.surface)
                 .overlay(RoundedRectangle(cornerRadius: 10).stroke(text.isEmpty ? Theme.border : Theme.teal))
                 .foregroundColor(.white)
+                .accessibilityIdentifier(title)
         }
     }
 }

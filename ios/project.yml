@@ -13,7 +13,7 @@ targets:
     platform: iOS
     sources: [Loopr]
     scheme:
-      testTargets: [LooprTests]
+      testTargets: [LooprTests, LooprUITests]
     info:
       path: Loopr/Info.plist
       properties:
@@ -32,5 +32,11 @@ targets:
     type: bundle.unit-test
     platform: iOS
     sources: [LooprTests]
+    dependencies:
+      - target: Loopr
+  LooprUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [LooprUITests]
     dependencies:
       - target: Loopr

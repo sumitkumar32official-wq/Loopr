@@ -126,7 +126,9 @@ final class OnboardingViewModel: ObservableObject {
     // MARK: Society
     func start() async {
         if let me: MeResponse = try? await api.get("me") { phone = me.phone }
-        coords = await location.current()
+        if !ProcessInfo.processInfo.arguments.contains("-uitest") {   // avoid the system permission alert in UI tests
+            coords = await location.current()
+        }
         await searchSocieties()
     }
 

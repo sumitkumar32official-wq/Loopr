@@ -91,6 +91,7 @@ struct PhoneOTPView: View {
                 Text("+91").foregroundColor(Theme.textSecondary)
                 TextField("98765 43210", text: $vm.digits)
                     .keyboardType(.numberPad).textContentType(.telephoneNumber).focused($focused)
+                    .accessibilityIdentifier("phoneField")
                     .onChange(of: vm.digits) { _, v in vm.digits = String(v.filter(\.isNumber).prefix(10)) }
             }
             .padding().background(Theme.surface)
@@ -107,6 +108,7 @@ struct PhoneOTPView: View {
             Text("Code sent to +91 \(vm.digits)").font(.loBody).foregroundColor(Theme.textSecondary)
             TextField("6-digit code", text: $vm.code)
                 .keyboardType(.numberPad).textContentType(.oneTimeCode).focused($focused)
+                .accessibilityIdentifier("otpField")
                 .padding().background(Theme.surface)
                 .overlay(RoundedRectangle(cornerRadius: 10).stroke(vm.error == nil ? Theme.teal : Theme.danger))
                 .modifier(Shake(animatableData: CGFloat(vm.shake)))
