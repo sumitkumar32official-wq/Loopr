@@ -1,0 +1,4 @@
+// EDIT THIS: your Windows PC's LAN IPv4 (run `ipconfig`, look for "IPv4 Address").
+// Phone and PC must be on the same Wi-Fi. The backend runs with `.\dev.ps1 run`.
+// ("/$()/" is how xcconfig spells "//".)
+LOOPR_API_BASE_URL = http:/$()/192.168.1.100:8000

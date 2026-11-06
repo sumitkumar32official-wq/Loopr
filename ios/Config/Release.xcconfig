@@ -1,0 +1,2 @@
+// Set the real production URL before release. Do not commit secrets here.
+LOOPR_API_BASE_URL = https:/$()/api.example.com

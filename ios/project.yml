@@ -1,0 +1,36 @@
+# Generate the Xcode project on a Mac:  brew install xcodegen && xcodegen generate
+name: Loopr
+options:
+  bundleIdPrefix: app.loopr
+  deploymentTarget:
+    iOS: "17.0"
+configFiles:
+  Debug: Config/Debug.xcconfig
+  Release: Config/Release.xcconfig
+targets:
+  Loopr:
+    type: application
+    platform: iOS
+    sources: [Loopr]
+    scheme:
+      testTargets: [LooprTests]
+    info:
+      path: Loopr/Info.plist
+      properties:
+        CFBundleDisplayName: Loopr
+        UILaunchScreen: {}
+        LOOPR_API_BASE_URL: $(LOOPR_API_BASE_URL)
+        NSLocationWhenInUseUsageDescription: Loopr uses your location to show societies near you.
+        NSCameraUsageDescription: Used to attach photos to service issues.
+        UIUserInterfaceStyle: Dark
+        # Dev only: lets the phone call the backend over plain HTTP on your LAN. Remove for release.
+        NSAppTransportSecurity: {NSAllowsLocalNetworking: true, NSAllowsArbitraryLoads: true}
+        NSLocalNetworkUsageDescription: Loopr connects to your development server on the local network.
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: app.loopr.ios
+  LooprTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [LooprTests]
+    dependencies:
+      - target: Loopr

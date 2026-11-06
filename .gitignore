@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+*.db
+.pytest_cache/
+ios/*.xcodeproj
+ios/build/
+ios/xcodebuild.log
+xcuserdata/
+.DS_Store

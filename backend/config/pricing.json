@@ -1,0 +1,22 @@
+{
+  "currency": "INR",
+  "gst_percent": 0,
+  "plans": {
+    "car_5_seater": {"label": "Monthly Clean · 5 seater", "monthly": 949},
+    "car_7_seater": {"label": "Monthly Clean · 7 seater", "monthly": 1149},
+    "bike": {"label": "Bike clean", "monthly": 199}
+  },
+  "bundle": {"bike_addon_monthly": 149, "label": "Car & Bike Bundle"},
+  "annual_discount_percent": 10,
+  "pause": {"max_days_per_month": 7},
+  "on_demand": {
+    "exterior": {"label": "Exterior wash", "price": 149, "minutes": 20},
+    "full": {"label": "Exterior + Interior", "price": 299, "minutes": 45},
+    "interior": {"label": "Interior only", "price": 199, "minutes": 30}
+  },
+  "cancellation": {"free_hours": 12, "fee_hours": 5, "fee": 49, "max_fee_reschedules": 1},
+  "otp": {"length": 6, "max_attempts": 3, "lockout_minutes": 10, "resend_seconds": 60, "ttl_minutes": 5},
+  "retention": {"offer_percent": 20, "offer_months": 2},
+  "photo_retention_months": 12,
+  "slots": {"cleaners_per_slot": 2, "hours": [6, 7, 8, 9, 10, 11, 16, 17, 18, 19]}
+}
