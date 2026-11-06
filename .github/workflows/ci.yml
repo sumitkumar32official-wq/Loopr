@@ -17,7 +17,8 @@ jobs:
       - run: python -m pytest -q
 
   ios:
-    runs-on: macos-15
+    runs-on: macos-14
+    timeout-minutes: 30
     defaults: { run: { working-directory: ios } }
     steps:
       - uses: actions/checkout@v4
@@ -32,9 +33,12 @@ jobs:
       - name: Build and test (simulator, no signing)
         run: |
           set -o pipefail
+          # Use whichever iPhone simulator this runner image has.
+          UDID=$(xcrun simctl list devices available | grep -m1 -E "iPhone" | grep -oE "[0-9A-F]{8}-([0-9A-F]{4}-){3}[0-9A-F]{12}")
+          echo "Using simulator $UDID"
           xcodebuild test \
             -project Loopr.xcodeproj -scheme Loopr \
-            -destination 'platform=iOS Simulator,name=iPhone 16' \
+            -destination "id=$UDID" \
             -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO \
             2>&1 | tee xcodebuild.log
