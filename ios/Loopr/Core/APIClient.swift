@@ -3,7 +3,12 @@ import Security
 
 // MARK: - Keychain
 enum Keychain {
+    /// Fallback for when the Keychain refuses writes (unsigned simulator builds, e.g. CI / Appetize),
+    /// so the session still works for the lifetime of the process.
+    private static var memory: [String: String] = [:]
+
     static func save(_ value: String, key: String) {
+        memory[key] = value
         let data = Data(value.utf8)
         let base: [String: Any] = [kSecClass as String: kSecClassGenericPassword, kSecAttrAccount as String: key]
         SecItemDelete(base as CFDictionary)
@@ -17,11 +22,12 @@ enum Keychain {
         let q: [String: Any] = [kSecClass as String: kSecClassGenericPassword, kSecAttrAccount as String: key,
                                 kSecReturnData as String: true, kSecMatchLimit as String: kSecMatchLimitOne]
         var out: AnyObject?
-        guard SecItemCopyMatching(q as CFDictionary, &out) == errSecSuccess, let d = out as? Data else { return nil }
+        guard SecItemCopyMatching(q as CFDictionary, &out) == errSecSuccess, let d = out as? Data else { return memory[key] }
         return String(data: d, encoding: .utf8)
     }
 
     static func delete(key: String) {
+        memory[key] = nil
         SecItemDelete([kSecClass as String: kSecClassGenericPassword, kSecAttrAccount as String: key] as CFDictionary)
     }
 }
