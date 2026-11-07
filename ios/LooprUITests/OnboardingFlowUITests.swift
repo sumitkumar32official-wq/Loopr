@@ -40,7 +40,9 @@ final class OnboardingFlowUITests: XCTestCase {
         if !e.waitForExistence(timeout: timeout) {
             // Dump what the app actually shows, so a failure is diagnosable from the artifact alone.
             try? app.debugDescription.write(toFile: "\(shotDir)/tree-\(shotIndex).txt", atomically: true, encoding: .utf8)
-            XCTFail("Did not find any element containing '\(text)'", file: file, line: line)
+            let texts = app.staticTexts.allElementsBoundByIndex.map { $0.label }.filter { !$0.isEmpty }
+            let buttons = app.buttons.allElementsBoundByIndex.map { $0.label }.filter { !$0.isEmpty }
+            XCTFail("Did not find any element containing '\(text)'. Visible texts: \(texts). Buttons: \(buttons)", file: file, line: line)
         }
         return e
     }

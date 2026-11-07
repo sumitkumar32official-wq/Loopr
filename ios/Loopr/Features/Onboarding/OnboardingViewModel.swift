@@ -48,12 +48,16 @@ final class LocationProvider: NSObject, CLLocationManagerDelegate {
     private let mgr = CLLocationManager()
     private var cont: CheckedContinuation<CLLocation?, Never>?
 
-    func current() async -> CLLocation? {
+    func current(timeout: TimeInterval = 5) async -> CLLocation? {
         mgr.delegate = self
         switch mgr.authorizationStatus {
         case .denied, .restricted: return nil
         case .notDetermined: mgr.requestWhenInUseAuthorization()
         default: break
+        }
+        // Give up after `timeout` so a missing location fix (e.g. simulator) can't hang the caller.
+        DispatchQueue.main.asyncAfter(deadline: .now() + timeout) { [weak self] in
+            self?.cont?.resume(returning: nil); self?.cont = nil
         }
         return await withCheckedContinuation { c in
             cont = c
@@ -126,10 +130,11 @@ final class OnboardingViewModel: ObservableObject {
     // MARK: Society
     func start() async {
         if let me: MeResponse = try? await api.get("me") { phone = me.phone }
+        await searchSocieties()   // show the list immediately; never block on location
         if !ProcessInfo.processInfo.arguments.contains("-uitest") {   // avoid the system permission alert in UI tests
-            coords = await location.current()
+            coords = await location.current(timeout: 5)
+            if coords != nil, query.trimmingCharacters(in: .whitespaces).isEmpty { await searchSocieties() }   // re-sort nearest-first
         }
-        await searchSocieties()
     }
 
     func searchSocieties() async {
