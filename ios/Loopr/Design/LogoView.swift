@@ -44,12 +44,16 @@ struct LooprLogo: View {
                 WheelShape(color: wheelColor.opacity(0.85), rotation: .degrees(spin ? -360 : 0))
                     .frame(width: height * 0.82, height: height * 0.82)
             }
-            Text("PR").font(.system(size: height, weight: .heavy, design: .rounded)).foregroundColor(textColor)
+            HStack(alignment: .lastTextBaseline, spacing: height * 0.02) {
+                Text("P").font(.system(size: height, weight: .heavy, design: .rounded))
+                Text("R").font(.system(size: height * 0.68, weight: .heavy, design: .rounded))   // small "R"
+            }
+            .foregroundColor(textColor)
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Loopr")
         .onAppear {
-            guard animated else { return }
+            guard animated, !ProcessInfo.processInfo.arguments.contains("-uitest") else { return }   // endless animation stalls XCUITest idle checks
             withAnimation(.linear(duration: 6).repeatForever(autoreverses: false)) { spin = true }
         }
     }

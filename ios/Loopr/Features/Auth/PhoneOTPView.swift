@@ -68,7 +68,7 @@ struct PhoneOTPView: View {
         ZStack {
             Theme.bg.ignoresSafeArea()
             VStack(alignment: .leading, spacing: Theme.Space.l) {
-                LooprLogo(height: 34).padding(.bottom, Theme.Space.xl)
+                LooprLogo(height: 34, animated: true).padding(.bottom, Theme.Space.xl)
                 switch vm.step {
                 case .phone: phoneStep
                 case .otp: otpStep
