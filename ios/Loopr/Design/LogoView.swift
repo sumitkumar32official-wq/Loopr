@@ -44,11 +44,7 @@ struct LooprLogo: View {
                 WheelShape(color: wheelColor.opacity(0.85), rotation: .degrees(spin ? -360 : 0))
                     .frame(width: height * 0.82, height: height * 0.82)
             }
-            HStack(alignment: .lastTextBaseline, spacing: height * 0.02) {
-                Text("P").font(.system(size: height, weight: .heavy, design: .rounded))
-                Text("R").font(.system(size: height * 0.68, weight: .heavy, design: .rounded))   // small "R"
-            }
-            .foregroundColor(textColor)
+            Text("Pr").font(.system(size: height, weight: .heavy, design: .rounded)).foregroundColor(textColor)   // lowercase "r"
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Loopr")
